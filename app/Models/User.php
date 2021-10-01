@@ -57,7 +57,7 @@ class User extends Authenticatable
         // return $this->belongsToMany('App\Models\Role','users_role','user_id','role_id'); if there is unique table name, unique id name yo lekhnu parxa otherwise tala ko code will be ok 
 
         
-        return $this->belongsToMany('App\Models\Role');
+        return $this->belongsToMany('App\Models\Role')->withPivot('created_at');
          
     }
 
