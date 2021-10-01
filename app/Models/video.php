@@ -5,11 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Photo extends Model
+class video extends Model
 {
     use HasFactory;
 
-    public function imageable(){
+    protected $fillable = ['path', 'videoable_id', 'videoable_type'];
+
+    public function videoable()
+    {
         return $this->morphTo();
     }
 }

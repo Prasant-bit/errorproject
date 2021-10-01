@@ -22,7 +22,23 @@ class Post extends Model
     ];
     use HasFactory;
 
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo('App\Models\Post');
+    }
+
+    public function photos()
+    {
+        return $this->morphMany('App\Models\Photo', 'imageable');
+    }
+
+    public function videos()
+    {
+        return $this->morphMany('App\Models\video', 'videoable');
+    }
+
+    public function tags()
+    {
+        return $this->morphToMany('App\Models\Tag', 'taggable');
     }
 }

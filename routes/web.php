@@ -6,6 +6,10 @@ use App\Models\User;
 use App\Models\Post;
 use App\Models\Role;
 use App\Models\Country;
+use App\Models\Gallery;
+use App\Models\Photo;
+use App\Models\Tag;
+use App\Models\video;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,13 +34,13 @@ use App\Models\Country;
 //     return "this url is " . $url;
 // }));
 
-Route::get('/post/{id}', [PostController::class,'index']);
+// Route::get('/post/{id}', [PostController::class,'index']);
 
-Route::resource('posts', PostController::class);
+// Route::resource('posts', PostController::class);
 
-Route::get('/contact',[PostController::class, 'showMyView']);
+// Route::get('/contact',[PostController::class, 'showMyView']);
 
-Route::get('/hello/{id}/{name}/{password}',[PostController::class, 'hello']);
+// Route::get('/hello/{id}/{name}/{password}',[PostController::class, 'hello']);
 
 //RAW SQL to insert data
 
@@ -85,7 +89,7 @@ Route::get('/hello/{id}/{name}/{password}',[PostController::class, 'hello']);
 
 // Route::get('find', function(){
 //     $post = Post::find(2);
-  
+
 //     return $post->address;
 // });
 
@@ -190,88 +194,159 @@ Route::get('/hello/{id}/{name}/{password}',[PostController::class, 'hello']);
 //     Post::where('id',7)->forceDelete();
 // });
 
-Route::get('/createdata', function(){
-    Post::create(['user_id'=>'1', 'name'=>'Jenisha', 'address'=>'Palpa', 'body'=>'hello from palpa', 'email'=>'jenisha@gmail.com']);
-});
+// Route::get('/createdata', function(){
+//     Post::create(['user_id'=>'1', 'name'=>'Jenisha', 'address'=>'Palpa', 'body'=>'hello from palpa', 'email'=>'jenisha@gmail.com']);
+// });
 
-Route::get('/forcedelete/{id}', function($id){
-    Post::find($id)->forceDelete();
-});
+// Route::get('/forcedelete/{id}', function($id){
+//     Post::find($id)->forceDelete();
+// });
 
-//Eloquent relationship
-//One to One relationship
+// //Eloquent relationship
+// //One to One relationship
 
-Route::get('/user/{id}/post', function($id){
-    return User::find($id)->post;
-});
+// Route::get('/user/{id}/post', function($id){
+//     return User::find($id)->post;
+// });
 
-//reverse function
+// //reverse function
 
-Route::get('/post/{id}/user', function($id){
-    return Post::find($id)->user->name;
-});
+// Route::get('/post/{id}/user', function($id){
+//     return Post::find($id)->user->name;
+// });
 
-//one to many relationship
+// //one to many relationship
 
-Route::get('/posts', function(){
-    $user = User::find(1)->posts;
+// Route::get('/posts', function(){
+//     $user = User::find(1)->posts;
 
-    foreach($user as $post){
-        echo $post->name .'<br>';
+//     foreach($user as $post){
+//         echo $post->name .'<br>';
+//     }
+// });
+
+// //Many to many relationship
+
+// //adding data in role table
+// Route::get('/createrole', function(){
+//     Role::create(['name'=>'Adminstrator']);
+// });
+
+// //create user
+// Route::get('/createuser', function(){
+//     User::create(['name'=>'Prasanti', 'email'=>'prasanti@gmail.com', 'password'=>'12345']);
+// });
+
+
+
+
+// //many to many relationship
+
+// Route::get('/user/{id}/role', function($id){
+//     // $users = User::find($id)->roles;
+
+//     // foreach($users as $role){
+//     //     return $role->name;
+//     // }
+
+//     $user = User::find($id)->roles()->orderBy('id','desc')->get();
+//     return $user;
+// });
+
+
+// //Quering Intermediate table / accessing intermediate or Pivot table
+
+// Route::get('user/pivot', function(){
+//     $user = User::find(1)->roles;
+//     foreach($user as $role){
+//         return $role->pivot->created_at;
+//     }
+// });
+
+// //has many through relation
+
+// //creating country
+// Route::get('countryname', function(){
+//     Country::create(['name'=>'UK']);
+// });
+
+
+// Route::get('/user/country', function(){
+//     $country = Country::find(6);
+
+//     foreach($country->countrypost as $role){
+//         return $role->name;
+//     }
+// });
+
+
+//polymorphic relations
+
+Route::get('user/photo', function () {
+    $users = User::find(1);
+    foreach ($users->photos as $user) {
+        return $user;
     }
 });
 
-//Many to many relationship
-
-//adding data in role table
-Route::get('/createrole', function(){
-    Role::create(['name'=>'Adminstrator']);
-});
-
-//create user
-Route::get('/createuser', function(){
-    User::create(['name'=>'Prasanti', 'email'=>'prasanti@gmail.com', 'password'=>'12345']);
-});
-
-
-
-
-//many to many relationship
-
-Route::get('/user/{id}/role', function($id){
-    // $users = User::find($id)->roles;
-
-    // foreach($users as $role){
-    //     return $role->name;
-    // }
-
-    $user = User::find($id)->roles()->orderBy('id','desc')->get();
-    return $user;
-});
-
-
-//Quering Intermediate table / accessing intermediate or Pivot table
-
-Route::get('user/pivot', function(){
-    $user = User::find(1)->roles;
-    foreach($user as $role){
-        return $role->pivot->created_at;
+Route::get('post/{id}/photo', function ($id) {
+    $posts = Post::find($id);
+    foreach ($posts->photos as $post) {
+        echo $post->path . "<br>";
     }
 });
 
-//has many through relation
+//polymorphic inverse relation
 
-//creating country
-Route::get('countryname', function(){
-    Country::create(['name'=>'UK']);
+Route::get('photo/{id}/post', function ($id) {
+    $photos = Photo::findOrFail($id);
+    return $photos->imageable;
 });
 
+//practice for polymorphic relation
 
-Route::get('/user/country', function(){
-    $country = Country::find(6);
+Route::get('createvideo', function () {
+    video::create(['path' => 'world.mp4', 'videoable_id' => '1', 'videoable_type' => 'App\Models\Post']);
+});
 
-    foreach($country->countrypost as $role){
-        return $role->name;
+Route::get('user/{id}/video', function ($id) {
+    $videos = User::findOrFail($id);
+
+    foreach ($videos->videos as $video) {
+        return $video->path;
     }
 });
 
+//polymorphic many to many
+
+Route::get('post/tag', function () {
+    $posts = Post::findOrFail(1);
+
+    foreach ($posts->tags as $tag) {
+        return $tag;
+    }
+});
+
+Route::get('gallery/tag', function () {
+    $galleries = Gallery::findOrFail(1);
+
+    foreach ($galleries->tags as $tag) {
+        return $tag;
+    }
+});
+
+//inverse polymorphic to see owner
+
+Route::get('/tag/post', function () {
+    $tags = Tag::find(2);
+    foreach ($tags->posts as $post) {
+        return $post->name;
+    }
+});
+
+Route::get('tag/gallery', function () {
+    $tags = Tag::findOrFail(1);
+    foreach ($tags->galleries as $gallery) {
+        return $gallery;
+    }
+});
